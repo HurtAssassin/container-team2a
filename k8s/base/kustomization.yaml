@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: container-team2a
+
+resources:
+  - 01-secret-db.yaml
+  - 02-pvc-postgres.yaml
+  - 03-svc-postgres.yaml
+  - 04-statefulset-postgres.yaml
+  - 05-deployment-app.yaml
+  - 06-service-app.yaml
+  - 07-ingress.yaml
+  - 08-job-init-schema.yaml
+  - 09-cloudflared-tunnel.yaml

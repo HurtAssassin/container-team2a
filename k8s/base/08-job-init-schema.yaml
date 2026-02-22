@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init-schema
+  namespace: container-team2a
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: psql
+          image: postgres:16
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret-team2a
+                  key: DB_PASSWORD
+            - name: DBUSER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret-team2a
+                  key: DB_USER
+            - name: DBNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret-team2a
+                  key: DB_NAME
+          command:
+            - sh
+            - -lc
+            - |
+              echo "Waiting for Postgres to be ready..."
+              until pg_isready -h svc-db -p 5432 -U "$DBUSER" -d "$DBNAME"; do
+                echo "Postgres is not ready yet. Sleeping 2s..."
+                sleep 2
+              done
+              echo "Postgres is ready. Applying schema..."
+              psql -h svc-db -U "$DBUSER" -d "$DBNAME" -v ON_ERROR_STOP=1 -c "CREATE TABLE IF NOT EXISTS guests (id SERIAL PRIMARY KEY, name VARCHAR(120) NOT NULL, email VARCHAR(120) NOT NULL, partysize INTEGER NOT NULL);"
+              echo "Schema applied successfully."

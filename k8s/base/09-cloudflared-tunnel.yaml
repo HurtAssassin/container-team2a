@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cf-quick-tunnel
+  namespace: container-team2a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cf-quick-tunnel
+  template:
+    metadata:
+      labels:
+        app: cf-quick-tunnel
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          args:
+            - tunnel
+            - --no-autoupdate
+            - --url
+            - http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
