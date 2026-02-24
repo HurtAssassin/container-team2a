@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-sql
+  namespace: container-team2a
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS guests (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(80),
+      email VARCHAR(120),
+      partysize INTEGER DEFAULT 1
+    );
